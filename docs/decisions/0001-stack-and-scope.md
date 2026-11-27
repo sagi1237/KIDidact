@@ -40,7 +40,7 @@ When comparing a typed answer to the stored word:
 - **Trim surrounding whitespace** before comparing (internal spacing still
   matters).
 
-Case handling for English stays as today (trim only). This rule lives in one
+English stays case-sensitive (confirmed 2026-11-27); trim only. This rule lives in one
 pure module reused everywhere grading happens (dictation, builder, choose,
 race).
 
@@ -55,8 +55,9 @@ race).
 
 ### 5. Hosting
 
-Frontend deployed to **Netlify or Vercel** (final pick deferred). No separate
-server to host — Supabase is the backend.
+Frontend deployed to **GitHub Pages** (decided 2026-11-27, replacing the
+earlier "Netlify or Vercel"). No separate server to host — Supabase is the
+backend.
 
 ## Migration phases
 

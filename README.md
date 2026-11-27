@@ -23,7 +23,7 @@ See the migration plan and locked decisions in
 | -------- | ------------------------------------------------- |
 | Frontend | React + TypeScript (Vite)                          |
 | Backend  | Supabase (auth + Postgres + storage) — no custom server |
-| Hosting  | Netlify or Vercel (frontend only)                  |
+| Hosting  | GitHub Pages (frontend only)                       |
 
 ## Repo layout
 
