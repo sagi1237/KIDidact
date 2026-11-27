@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>משחק הכתבה</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap');
+
+  :root{
+    --ink:#2b2440;
+    --paper:#fff9f0;
+    --lilac:#8b7bd8;
+    --lilac-dk:#6e5ec7;
+    --mint:#3fc9a5;
+    --sun:#ffb547;
+    --coral:#ff6f6f;
+    --card:#ffffff;
+    --line:#e9e2f5;
+    --shadow: 0 10px 30px rgba(107,86,180,0.16);
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 10% 15%, #f3e9ff 0%, transparent 45%),
+      radial-gradient(circle at 90% 85%, #e4fff5 0%, transparent 45%),
+      var(--paper);
+    font-family:'Rubik', sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:28px 16px 60px;
+  }
+
+  .app{ width:100%; max-width:640px; }
+
+  header{ text-align:center; margin-bottom:18px; }
+
+  .title{
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    font-size:2.1rem;
+    margin:0;
+    color:var(--lilac-dk);
+  }
+  .subtitle{
+    margin:4px 0 0;
+    font-size:0.95rem;
+    color:#7a7191;
+  }
+
+  .langbar{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin:18px 0 14px;
+  }
+  .langbtn{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    border:2px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    padding:9px 22px;
+    border-radius:999px;
+    cursor:pointer;
+    font-size:1rem;
+    transition: all .15s ease;
+  }
+  .langbtn.active{
+    background:var(--lilac);
+    border-color:var(--lilac);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(139,123,216,0.35);
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    padding:30px 26px;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:-40px; inset-inline-end:-40px;
+    width:120px; height:120px;
+    background:var(--sun);
+    opacity:0.15;
+    border-radius:50%;
+  }
+
+  h2.section-title{
+    font-family:'Fredoka', sans-serif;
+    font-size:1.1rem;
+    margin:0 0 14px;
+    color:var(--lilac-dk);
+  }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block;
+    font-size:0.85rem;
+    color:#8a819c;
+    margin-bottom:6px;
+    font-weight:500;
+  }
+  select{
+    width:100%;
+    font-family:'Rubik', sans-serif;
+    font-size:0.92rem;
+    border:2px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    padding:10px 12px;
+    border-radius:12px;
+    cursor:pointer;
+  }
+
+  .source-tabs{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .source-tab{
+    font-family:'Rubik', sans-serif;
+    font-size:0.85rem;
+    border:2px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    padding:9px 14px;
+    border-radius:12px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition: all .15s ease;
+  }
+  .source-tab.active{
+    border-color:var(--lilac);
+    background:#f6f3ff;
+    color:var(--lilac-dk);
+    font-weight:600;
+  }
+
+  .file-input{
+    width:100%;
+    font-family:'Rubik', sans-serif;
+    font-size:0.85rem;
+    border:2px dashed var(--line);
+    border-radius:12px;
+    padding:12px;
+    background:#fbfaff;
+    color:#7a7191;
+    cursor:pointer;
+  }
+
+  .custom-words-area{
+    width:100%;
+    font-family:'Rubik', sans-serif;
+    font-size:0.9rem;
+    padding:12px 14px;
+    border-radius:12px;
+    border:2px solid var(--line);
+    resize:vertical;
+    color:var(--ink);
+    background:#fbfaff;
+    outline:none;
+  }
+  .custom-words-area:focus{ border-color:var(--lilac); }
+
+  .list-name-input{
+    width:100%;
+    font-family:'Fredoka', sans-serif;
+    font-size:0.95rem;
+    padding:10px 14px;
+    border-radius:12px;
+    border:2px solid var(--line);
+    margin-top:10px;
+    color:var(--ink);
+    background:#fbfaff;
+    outline:none;
+  }
+  .list-name-input:focus{ border-color:var(--lilac); }
+
+  .saved-lists{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:240px;
+    overflow-y:auto;
+    padding-inline-end:4px;
+  }
+  .saved-list-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:11px 14px;
+    border:2px solid var(--line);
+    border-radius:14px;
+    cursor:pointer;
+    background:#fff;
+    transition: all .15s ease;
+  }
+  .saved-list-item.selected{
+    border-color:var(--lilac);
+    background:#f6f3ff;
+  }
+  .saved-list-info{ display:flex; flex-direction:column; gap:2px; }
+  .saved-list-name{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:0.95rem;
+    color:var(--ink);
+  }
+  .saved-list-meta{
+    font-size:0.75rem;
+    color:#8a819c;
+  }
+  .saved-list-delete{
+    background:none;
+    border:none;
+    color:var(--coral);
+    cursor:pointer;
+    font-size:1.05rem;
+    flex-shrink:0;
+  }
+
+  .count-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .count-row input[type="range"]{
+    flex:1;
+    accent-color: var(--lilac);
+    height:6px;
+    cursor:pointer;
+  }
+  .count-row input[type="number"]{
+    width:64px;
+    font-family:'Fredoka', sans-serif;
+    font-size:1rem;
+    font-weight:600;
+    text-align:center;
+    border:2px solid var(--line);
+    border-radius:12px;
+    padding:8px 6px;
+    color:var(--ink);
+  }
+
+  .mode-choice{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .mode-card{
+    flex:1;
+    min-width:220px;
+    border:2px solid var(--line);
+    border-radius:16px;
+    padding:14px 16px;
+    cursor:pointer;
+    transition: all .15s ease;
+    background:#fff;
+  }
+  .mode-card.selected{
+    border-color:var(--lilac);
+    background:#f6f3ff;
+    box-shadow:0 4px 14px rgba(139,123,216,0.18);
+  }
+  .mode-card .mode-emoji{ font-size:1.4rem; }
+  .mode-card .mode-name{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:0.98rem;
+    margin:4px 0 2px;
+  }
+  .mode-card .mode-desc{
+    font-size:0.8rem;
+    color:#7a7191;
+    line-height:1.4;
+  }
+
+  .start-btn{
+    width:100%;
+    margin-top:8px;
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    font-size:1.1rem;
+    border:none;
+    border-radius:16px;
+    padding:16px;
+    cursor:pointer;
+    background:var(--mint);
+    color:#fff;
+    box-shadow:0 8px 20px rgba(63,201,165,0.35);
+  }
+  .start-btn:hover{ filter:brightness(0.97); }
+
+  /* dictation screen */
+  .progress{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:0.85rem;
+    color:#8a819c;
+    margin-bottom:18px;
+  }
+  .streak{
+    font-weight:600;
+    color:var(--mint);
+  }
+  .progress-bar-track{
+    height:8px;
+    background:var(--line);
+    border-radius:99px;
+    overflow:hidden;
+    margin-bottom:22px;
+  }
+  .progress-bar-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--lilac), var(--mint));
+    border-radius:99px;
+    transition: width .3s ease;
+  }
+
+  .speak-row{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    margin:10px 0 26px;
+  }
+  .speak-btn{
+    width:96px; height:96px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(145deg, var(--lilac), var(--lilac-dk));
+    color:#fff;
+    font-size:2.3rem;
+    cursor:pointer;
+    box-shadow:0 10px 24px rgba(110,94,199,0.4);
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .12s ease;
+  }
+  .speak-btn:active{ transform: scale(0.94); }
+  .speak-btn.pulse{ animation: pulse 0.9s ease; }
+  .speak-btn:disabled{ opacity:0.35; cursor:default; }
+  @keyframes pulse{
+    0%{ box-shadow:0 10px 24px rgba(110,94,199,0.4); }
+    50%{ box-shadow:0 10px 24px rgba(110,94,199,0.4), 0 0 0 14px rgba(139,123,216,0.15); }
+    100%{ box-shadow:0 10px 24px rgba(110,94,199,0.4); }
+  }
+  .speak-hint{ font-size:0.85rem; color:#9188a3; text-align:center; }
+
+  .repeat-btn{
+    font-size:0.8rem;
+    color:var(--lilac-dk);
+    background:none;
+    border:none;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:0;
+  }
+
+  .enter-hint{
+    text-align:center;
+    font-size:0.78rem;
+    color:#a89fbb;
+    margin-top:10px;
+  }
+
+  /* word list (editable dictation rows) */
+  .word-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin:20px 0 6px;
+  }
+  .word-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .word-row .row-num{
+    width:22px;
+    flex-shrink:0;
+    text-align:center;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    color:#b5adc7;
+    font-size:0.85rem;
+  }
+  .word-row input{
+    flex:1;
+    font-family:'Fredoka', sans-serif;
+    font-size:1.1rem;
+    padding:11px 14px;
+    border-radius:12px;
+    border:2px solid var(--line);
+    outline:none;
+    color:var(--ink);
+    background:#fbfaff;
+    transition: border-color .15s ease;
+  }
+  .word-row input:focus{ border-color:var(--lilac); }
+  .word-row .row-icon{
+    width:24px;
+    flex-shrink:0;
+    text-align:center;
+    font-size:1.05rem;
+  }
+  .word-row.correct input{ border-color:var(--mint); background:#eafbf6; color:var(--mint); font-weight:600; }
+  .word-row.incorrect{ cursor:pointer; }
+  .word-row.incorrect input{ border-color:var(--coral); background:#fff0f0; cursor:pointer; }
+  .correct-reveal{
+    font-size:0.8rem;
+    color:var(--coral);
+    margin:-2px 0 4px 34px;
+    display:none;
+    font-weight:500;
+  }
+  [dir="rtl"] .correct-reveal{ margin:-2px 34px 4px 0; }
+  .word-row.show-correct + .correct-reveal{ display:block; }
+
+  /* score summary */
+  .score-summary{
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .score-num{
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    font-size:2.6rem;
+    color:var(--mint);
+    display:block;
+  }
+  .score-label{
+    font-size:0.9rem;
+    color:#8a819c;
+  }
+
+  .restart-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .ctrl-btn{
+    flex:1;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:0.92rem;
+    border:none;
+    border-radius:14px;
+    padding:13px;
+    cursor:pointer;
+    background:#f1eefc;
+    color:var(--lilac-dk);
+  }
+  .ctrl-btn.primary{
+    background:var(--mint);
+    color:#fff;
+  }
+
+  .hidden{ display:none !important; }
+
+  /* practice hub */
+  .practice-hub-list{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin:18px 0 22px;
+  }
+  .practice-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+    border:2px solid var(--line);
+    border-radius:18px;
+    cursor:pointer;
+    transition: all .15s ease;
+    background:#fff;
+  }
+  .practice-card:hover{ border-color:var(--lilac); background:#f9f7ff; }
+  .practice-card.disabled{ opacity:0.5; cursor:default; }
+  .practice-card.disabled:hover{ border-color:var(--line); background:#fff; }
+  .practice-emoji{ font-size:1.8rem; flex-shrink:0; }
+  .practice-info{ display:flex; flex-direction:column; gap:2px; }
+  .practice-name{ font-family:'Fredoka', sans-serif; font-weight:600; font-size:1.05rem; color:var(--ink); }
+  .practice-desc{ font-size:0.8rem; color:#7a7191; }
+  .practice-soon{
+    margin-inline-start:auto;
+    font-size:0.72rem;
+    background:var(--sun);
+    color:#5a3d00;
+    padding:3px 10px;
+    border-radius:999px;
+    font-weight:600;
+    flex-shrink:0;
+  }
+
+  /* builder game (letter scramble) */
+  .builder-slots{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:20px 0;
+    min-height:56px;
+  }
+  .builder-slot{
+    width:44px; height:52px;
+    border-bottom:4px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:1.5rem;
+    color:var(--ink);
+    transition: border-color .15s ease;
+  }
+  .builder-slot.filled{ border-color:var(--lilac); }
+  .builder-slot.wrong{ border-color:var(--coral); animation: shake 0.3s ease; }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-4px); }
+    75%{ transform:translateX(4px); }
+  }
+  .builder-tiles{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:22px 0 6px;
+  }
+  .builder-tile{
+    width:48px; height:48px;
+    border-radius:14px;
+    border:none;
+    background:var(--sun);
+    color:#5a3d00;
+    font-family:'Fredoka', sans-serif;
+    font-weight:700;
+    font-size:1.3rem;
+    cursor:pointer;
+    box-shadow:0 4px 0 #dd9420;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .builder-tile:active{ transform: translateY(3px); box-shadow:0 1px 0 #dd9420; }
+  .builder-tile.used{ visibility:hidden; }
+  .builder-feedback{
+    text-align:center;
+    min-height:1.6em;
+    font-weight:600;
+    margin-top:14px;
+    font-size:1rem;
+  }
+  .builder-feedback.good{ color:var(--mint); }
+  .builder-feedback.bad{ color:var(--coral); }
+
+  /* choose game ("which one's correct?") */
+  .choose-options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin:22px 0 6px;
+  }
+  .choose-option{
+    font-family:'Fredoka', sans-serif;
+    font-size:1.15rem;
+    padding:14px;
+    border:2px solid var(--line);
+    border-radius:14px;
+    cursor:pointer;
+    background:#fff;
+    text-align:center;
+    color:var(--ink);
+    transition: all .15s ease;
+  }
+  .choose-option:hover{ border-color:var(--lilac); background:#f9f7ff; }
+  .choose-option.correct{
+    background:#eafbf6; border-color:var(--mint); color:var(--mint); font-weight:700;
+  }
+  .choose-option.incorrect{
+    background:#fff0f0; border-color:var(--coral); color:var(--coral); font-weight:700;
+  }
+  .choose-option.disabled{ cursor:default; pointer-events:none; }
+
+  /* race game */
+  .answer-input-race{
+    width:100%;
+    font-family:'Fredoka', sans-serif;
+    font-size:1.6rem;
+    text-align:center;
+    padding:16px;
+    border-radius:16px;
+    border:2px solid var(--line);
+    outline:none;
+    color:var(--ink);
+    background:#fbfaff;
+    transition: border-color .1s ease, background .1s ease;
+    margin-top:8px;
+  }
+  .answer-input-race:focus{ border-color:var(--lilac); }
+  .answer-input-race.flash-good{ border-color:var(--mint); background:#eafbf6; }
+  .answer-input-race.flash-bad{ border-color:var(--coral); background:#fff0f0; }
+
+  @media (max-width:420px){
+    .speak-btn{ width:82px; height:82px; font-size:2rem; }
+    .answer-input{ font-size:1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app" dir="rtl">
+
+  <header>
+    <h1 class="title" id="titleText">✍️ משחק הכתבה</h1>
+    <p class="subtitle" id="subtitleText">מקשיבים למילים וכותבים אותן ברצף</p>
+  </header>
+
+  <div class="langbar">
+    <button class="langbtn active" id="btnHe" onclick="setLang('he')">עברית</button>
+    <button class="langbtn" id="btnEn" onclick="setLang('en')">English</button>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div class="card" id="setupScreen">
+    <h2 class="section-title" id="setupTitle">הגדרות ההכתבה</h2>
+
+    <div class="field">
+      <label id="labelSource">מקור המילים</label>
+      <div class="source-tabs" id="sourceTabs">
+        <button class="source-tab active" id="tabGeneral" onclick="setSource('general')">📚 <span id="srcGeneralLabel">מאגר כללי</span></button>
+        <button class="source-tab" id="tabExcel" onclick="setSource('excel')">📊 <span id="srcExcelLabel">קובץ אקסל</span></button>
+        <button class="source-tab" id="tabImage" onclick="setSource('image')">🖼️ <span id="srcImageLabel">תמונה</span></button>
+        <button class="source-tab" id="tabPdf" onclick="setSource('pdf')">📄 <span id="srcPdfLabel">PDF</span></button>
+        <button class="source-tab" id="tabTyping" onclick="setSource('typing')">⌨️ <span id="srcTypingLabel">הקלדה</span></button>
+        <button class="source-tab" id="tabSaved" onclick="setSource('saved')">📁 <span id="srcSavedLabel">רשימות שמורות</span></button>
+      </div>
+    </div>
+
+    <div class="field" id="topicField">
+      <label id="labelTopic">נושא</label>
+      <select id="topicFilter" onchange="updateCountAvailable()"></select>
+    </div>
+
+    <div class="field hidden" id="customSourcePanel">
+      <div id="fileInputWrap" class="hidden">
+        <input type="file" id="fileInput" class="file-input" onchange="handleFileSelected()">
+        <button class="ctrl-btn" id="extractBtn" onclick="runExtraction()" style="width:100%; margin-top:8px;"></button>
+      </div>
+      <p class="enter-hint" id="extractStatus" style="text-align:start; min-height:1.2em;"></p>
+      <label id="labelCustomWords" style="display:block; font-size:0.85rem; color:#8a819c; margin:10px 0 6px; font-weight:500;"></label>
+      <textarea id="customWordsArea" rows="5" class="custom-words-area" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+      <input type="text" id="listNameInput" class="list-name-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button class="ctrl-btn primary" id="useListBtn" onclick="commitCustomWordsFromTextarea()" style="width:100%; margin-top:10px;"></button>
+    </div>
+
+    <div class="field hidden" id="savedListsPanel">
+      <p class="enter-hint" id="noteMemoryOnly" style="text-align:start; margin-bottom:10px;"></p>
+      <div class="saved-lists" id="savedListsContainer"></div>
+      <p class="enter-hint" id="savedListsEmpty"></p>
+    </div>
+
+    <div class="field">
+      <label id="labelLen">מספר אותיות</label>
+      <select id="lenFilter" onchange="updateCountAvailable()"></select>
+    </div>
+    <div class="field">
+      <label id="labelLetter">אות ראשונה</label>
+      <select id="letterFilter" onchange="updateCountAvailable()"></select>
+    </div>
+
+    <div class="field">
+      <label id="labelCount">כמות מילים ברשימה</label>
+      <div class="count-row">
+        <input type="range" id="countSlider" min="0" max="100" value="10" oninput="syncCountFromSlider()">
+        <input type="number" id="countInput" min="0" max="100" value="10" oninput="syncCountFromInput()">
+      </div>
+      <p class="enter-hint" id="countAvailable" style="text-align:start;"></p>
+    </div>
+
+    <div class="field">
+      <label id="labelMode">קצב ההקראה</label>
+      <div class="mode-choice">
+        <div class="mode-card selected" id="modeManualCard" onclick="setMode('manual')">
+          <div class="mode-emoji">👆</div>
+          <div class="mode-name" id="modeManualName">מילה בלחיצה</div>
+          <div class="mode-desc" id="modeManualDesc">המילה הבאה תישמע רק כשלוחצים על כפתור ההשמעה</div>
+        </div>
+        <div class="mode-card" id="modeAutoCard" onclick="setMode('auto')">
+          <div class="mode-emoji">🔁</div>
+          <div class="mode-name" id="modeAutoName">רצף אוטומטי</div>
+          <div class="mode-desc" id="modeAutoDesc">אחרי כל מילה, המילה הבאה תישמע אוטומטית — הבדיקה בסוף</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="ctrl-btn" id="testVoiceBtn" onclick="testVoice()" style="width:100%; margin-bottom:10px;">🔊 בדיקת קול</button>
+    <p class="enter-hint" id="voiceStatus" style="margin:-4px 0 14px;"></p>
+
+    <button class="start-btn" id="startBtn" onclick="startDictation()">▶️ התחילו הכתבה</button>
+  </div>
+
+  <!-- DICTATION SCREEN -->
+  <div class="card hidden" id="dictationScreen">
+    <div class="progress" id="progressRow">
+      <span id="progressText">מילה 1 מתוך 8</span>
+    </div>
+    <div class="progress-bar-track" id="progressBarTrack"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+
+    <div class="score-summary hidden" id="scoreSummary">
+      <span class="score-num" id="scoreNum">0/0</span>
+      <span class="score-label" id="scoreLabel">מילים נכונות</span>
+    </div>
+
+    <div class="speak-row" id="speakRow">
+      <button class="speak-btn" id="speakBtn" onclick="speakCurrent(true)" aria-label="השמע מילה">🔊</button>
+      <span class="speak-hint" id="speakHintText"></span>
+      <button class="repeat-btn hidden" id="repeatBtn" onclick="speakCurrent(true)">🔁 השמע שוב</button>
+    </div>
+
+    <div class="word-list" id="wordList"></div>
+
+    <p class="enter-hint" id="enterHint">אפשר גם ללחוץ Enter כדי לעבור למילה הבאה</p>
+
+    <button class="start-btn hidden" id="finishBtn" onclick="finishDictation()">✅ סיום ובדיקה</button>
+
+    <div class="restart-row hidden" id="restartRow">
+      <button class="ctrl-btn" onclick="backToSetup()" id="backBtn">⚙️ הגדרות חדשות</button>
+      <button class="ctrl-btn primary" onclick="startDictation()" id="againBtn">🔄 שוב על אותה רשימה</button>
+    </div>
+    <button class="start-btn hidden" id="practiceBtn" onclick="openPracticeHub()" style="margin-top:10px; background:var(--lilac);">🎮 תרגול על המילים האלה</button>
+  </div>
+
+  <!-- PRACTICE HUB SCREEN -->
+  <div class="card hidden" id="practiceHubScreen">
+    <h2 class="section-title" id="practiceHubTitle">בחרו משחק תרגול</h2>
+    <p class="enter-hint" id="practiceHubSubtitle" style="text-align:start; margin:-6px 0 16px;"></p>
+
+    <div class="practice-hub-list" id="practiceHubList">
+      <div class="practice-card" onclick="startBuilderGame()">
+        <span class="practice-emoji">🧩</span>
+        <div class="practice-info">
+          <span class="practice-name" id="builderGameName">בונה המילים</span>
+          <span class="practice-desc" id="builderGameDesc">שומעים את המילה ובונים אותה מאותיות מעורבבות</span>
+        </div>
+      </div>
+      <div class="practice-card" onclick="startChooseGame()">
+        <span class="practice-emoji">🎯</span>
+        <div class="practice-info">
+          <span class="practice-name" id="chooseGameName">איזו נכונה?</span>
+          <span class="practice-desc" id="chooseGameDesc">בוחרים את האיות הנכון מבין כמה אפשרויות</span>
+        </div>
+      </div>
+      <div class="practice-card" onclick="startRaceGame()">
+        <span class="practice-emoji">⚡</span>
+        <div class="practice-info">
+          <span class="practice-name" id="raceGameName">מירוץ נגד הזמן</span>
+          <span class="practice-desc" id="raceGameDesc">כותבים כמה שיותר מילים נכון לפני שהזמן נגמר</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="restart-row">
+      <button class="ctrl-btn" onclick="backToResults()" id="practiceHubBackBtn">↩️ חזרה לתוצאות</button>
+      <button class="ctrl-btn" onclick="backToSetup()" id="practiceHubSetupBtn">⚙️ הגדרות חדשות</button>
+    </div>
+  </div>
+
+  <!-- BUILDER GAME SCREEN -->
+  <div class="card hidden" id="builderGameScreen">
+    <div class="progress">
+      <span id="builderProgressText">מילה 1 מתוך 8</span>
+      <span class="streak" id="builderStreakText">🔥 רצף: 0</span>
+    </div>
+
+    <div class="speak-row">
+      <button class="speak-btn" id="builderSpeakBtn" onclick="speakBuilderWord(true)" aria-label="השמע מילה">🔊</button>
+      <span class="speak-hint" id="builderSpeakHint">לחצו כדי לשמוע את המילה</span>
+    </div>
+
+    <div class="builder-slots" id="builderSlots"></div>
+    <div class="builder-tiles" id="builderTiles"></div>
+    <div class="builder-feedback" id="builderFeedback"></div>
+
+    <div class="restart-row" style="margin-top:20px;">
+      <button class="ctrl-btn" onclick="clearBuilderSlots()" id="builderClearBtn">🧹 נקה</button>
+      <button class="ctrl-btn" onclick="removeLastBuilderLetter()" id="builderBackspaceBtn">⌫ מחק אות</button>
+    </div>
+    <div class="restart-row">
+      <button class="ctrl-btn primary" onclick="checkBuilderWord()" id="builderCheckBtn">✅ בדוק</button>
+      <button class="ctrl-btn" onclick="nextBuilderWord()" id="builderNextBtn">⏭️ מילה הבאה</button>
+    </div>
+
+    <div class="restart-row" style="margin-top:10px;">
+      <button class="ctrl-btn" onclick="backToResults()" id="builderBackBtn">↩️ חזרה לתוצאות</button>
+      <button class="ctrl-btn" onclick="backToSetup()" id="builderSetupBtn">⚙️ הגדרות חדשות</button>
+    </div>
+  </div>
+
+  <!-- CHOOSE GAME SCREEN ("Which one's correct?") -->
+  <div class="card hidden" id="chooseGameScreen">
+    <div class="progress">
+      <span id="chooseProgressText">מילה 1 מתוך 8</span>
+      <span class="streak" id="chooseStreakText">🔥 רצף: 0</span>
+    </div>
+
+    <div class="speak-row">
+      <button class="speak-btn" id="chooseSpeakBtn" onclick="speakChooseWord(true)" aria-label="השמע מילה">🔊</button>
+      <span class="speak-hint" id="chooseSpeakHint">מקשיבים ובוחרים את האיות הנכון</span>
+    </div>
+
+    <div class="choose-options" id="chooseOptions"></div>
+    <div class="builder-feedback" id="chooseFeedback"></div>
+
+    <div class="restart-row" style="margin-top:10px;">
+      <button class="ctrl-btn" onclick="backToResults()" id="chooseBackBtn">↩️ חזרה לתוצאות</button>
+      <button class="ctrl-btn" onclick="backToSetup()" id="chooseSetupBtn">⚙️ הגדרות חדשות</button>
+    </div>
+  </div>
+
+  <!-- RACE GAME SCREEN ("Race against time") -->
+  <div class="card hidden" id="raceGameScreen">
+    <div id="raceIntroPanel">
+      <h2 class="section-title" id="raceIntroTitle">מירוץ נגד הזמן</h2>
+      <p class="enter-hint" id="raceIntroDesc" style="text-align:start; margin-bottom:18px;"></p>
+      <button class="start-btn" id="raceStartBtn" onclick="beginRaceGame()">▶️ התחילו מירוץ</button>
+    </div>
+
+    <div id="racePlayPanel" class="hidden">
+      <div class="progress">
+        <span id="raceTimerText">⏱️ 60</span>
+        <span class="streak" id="raceScoreText">⭐ 0</span>
+      </div>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="raceTimerFill" style="width:100%"></div></div>
+
+      <div class="speak-row">
+        <span class="speak-hint" id="raceHintText"></span>
+      </div>
+
+      <input type="text" class="answer-input-race" id="raceInput" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+
+    <div id="raceResultsPanel" class="hidden">
+      <div class="score-summary">
+        <span class="score-num" id="raceResultScore">0</span>
+        <span class="score-label" id="raceResultLabel"></span>
+      </div>
+      <div class="restart-row">
+        <button class="ctrl-btn" onclick="backToResults()" id="raceBackBtn">↩️ חזרה לתוצאות</button>
+        <button class="ctrl-btn primary" onclick="startRaceGame()" id="raceAgainBtn">🔄 עוד סיבוב</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+<script>
+/* ---------- Word banks ---------- */
+const WORD_BANKS = {
+  he: [
+    { word:"כלב", topic:"בעלי חיים" },
+    { word:"חתול", topic:"בעלי חיים" },
+    { word:"פרפר", topic:"בעלי חיים" },
+    { word:"שמש", topic:"טבע" },
+    { word:"ירח", topic:"טבע" },
+    { word:"עץ", topic:"טבע" },
+    { word:"תפוח", topic:"אוכל" },
+    { word:"לחם", topic:"אוכל" },
+    { word:"ספר", topic:"בית ספר" },
+    { word:"מחברת", topic:"בית ספר" },
+    { word:"מורה", topic:"בית ספר" },
+    { word:"בית", topic:"בית" },
+  ],
+  en: [
+    { word:"dog", topic:"animals" },
+    { word:"cat", topic:"animals" },
+    { word:"lion", topic:"animals" },
+    { word:"sun", topic:"nature" },
+    { word:"moon", topic:"nature" },
+    { word:"tree", topic:"nature" },
+    { word:"apple", topic:"food" },
+    { word:"bread", topic:"food" },
+    { word:"book", topic:"school" },
+    { word:"pencil", topic:"school" },
+    { word:"teacher", topic:"school" },
+    { word:"house", topic:"home" },
+  ]
+};
+
+const TXT = {
+  he: {
+    title: "✍️ משחק הכתבה",
+    subtitle: "מקשיבים למילים וכותבים אותן ברצף",
+    setupTitle: "הגדרות ההכתבה",
+    labelTopic: "נושא", labelLen: "מספר אותיות", labelLetter: "אות ראשונה", labelMode: "קצב ההקראה",
+    labelSource: "מקור המילים",
+    srcGeneral:"מאגר כללי", srcExcel:"קובץ אקסל", srcImage:"תמונה", srcPdf:"PDF", srcTyping:"הקלדה", srcSaved:"רשימות שמורות",
+    listNamePlaceholder:"שם לרשימה (לדוגמה: הכתבה שבועית - שיעור 3)",
+    statusSavedAs:(name)=>`נשמרה בשם "${name}" ונוספה לרשימות השמורות`,
+    savedListsEmptyText:"עדיין אין רשימות שמורות. צרו רשימה בטאב אקסל/תמונה/PDF/הקלדה כדי שתופיע כאן.",
+    savedListMeta:(n)=>`${n} מילים`,
+    savedListDeleteConfirm:"למחוק את הרשימה הזו?",
+    noteMemoryOnly:"⚠️ הרשימות נשמרות רק כל עוד העמוד פתוח — רענון דף ימחק אותן.",
+    filePromptExcel:"בחרו קובץ אקסל (xlsx/xls/csv)",
+    filePromptImage:"בחרו תמונה עם מילים כתובות",
+    filePromptPdf:"בחרו קובץ PDF",
+    extractBtnExcel:"📊 חלצו מילים מהקובץ",
+    extractBtnImage:"🔍 זהו מילים בתמונה",
+    extractBtnPdf:"📄 חלצו מילים מה-PDF",
+    labelCustomWords:"רשימת מילים (אפשר לערוך, מילה בכל שורה או מופרדות בפסיק)",
+    useListBtn:"✅ השתמשו ברשימה הזו",
+    typingPlaceholder:"כתבו כאן מילים — אחת בכל שורה, או מופרדות בפסיקים",
+    statusPickFile:"בחרו קובץ קודם",
+    statusProcessing:"🔄 מעבד את הקובץ...",
+    statusOcr:(p)=>`🔍 מזהה טקסט בתמונה... ${p}%`,
+    statusDoneExcel:(n)=>`✅ חולצו ${n} פריטים מהקובץ. בדקו, ערכו במידת הצורך, ולחצו "השתמשו ברשימה הזו"`,
+    statusDoneImage:(n)=>`✅ זוהו ${n} מילים בתמונה. בדקו, תקנו שגיאות זיהוי, ולחצו "השתמשו ברשימה הזו"`,
+    statusDonePdf:(n)=>`✅ חולצו ${n} מילים מה-PDF. בדקו, ערכו במידת הצורך, ולחצו "השתמשו ברשימה הזו"`,
+    statusLoadError:"⚠️ לא הצלחנו לטעון את ספריית העיבוד. בדקו חיבור לאינטרנט ונסו שוב.",
+    statusExtractError:"⚠️ לא הצלחנו לחלץ טקסט מהקובץ הזה. נסו קובץ אחר.",
+    statusCommitted:(n)=>`✅ נטענו ${n} מילים לרשימה`,
+    statusEmptyList:"⚠️ הרשימה ריקה — הוסיפו מילים לפני השימוש",
+    labelCount: "כמות מילים ברשימה",
+    countAvailable:(n)=> n===1 ? `מילה זמינה 1 בסינון הנוכחי` : `${n} מילים זמינות בסינון הנוכחי`,
+    countCapped:(n)=> `יש רק ${n} מילים בסינון — כל המילים ייכללו`,
+    topicAll: "כל הנושאים", lenAll: "כל האורכים", letterAll: "כל האותיות",
+    lenLabel:(n)=>`${n} אותיות`, letterLabel:(l)=>`מתחיל ב-${l}`,
+    modeManualName:"מילה בלחיצה", modeManualDesc:"המילה הבאה תישמע רק כשלוחצים על כפתור ההשמעה",
+    modeAutoName:"רצף אוטומטי", modeAutoDesc:"אחרי כל מילה, המילה הבאה תישמע אוטומטית — הבדיקה בסוף",
+    startBtn:"▶️ התחילו הכתבה",
+    testVoice:"🔊 בדיקת קול",
+    voiceOk:"✅ יש קול! אפשר להתחיל",
+    voiceNone:"⚠️ לא נמצא קול לעברית בדפדפן הזה. נסו לפתוח את הקובץ ישירות בדפדפן (כרום/ספארי) במקום בתצוגה המקדימה, או לבדוק ב-Windows/Mac שקול עברי מותקן.",
+    voiceUnsupported:"⚠️ הדפדפן הזה לא תומך בהקראה (Web Speech API).",
+    voiceTesting:"🔄 בודק...",
+    progress:(i,n)=>`מילה ${i} מתוך ${n}`,
+    speakHintManual:"לחצו כדי לשמוע את המילה הראשונה",
+    speakHintAuto:"המילה תישמע — התחילו לכתוב",
+    placeholder:"כתבו כאן...",
+    submitBtn:"המילה הבאה ⏎", finishBtn:"✅ סיום ובדיקה",
+    enterHint:"אפשר גם ללחוץ Enter כדי לעבור למילה הבאה",
+    scoreLabel:"מילים נכונות",
+    backBtn:"⚙️ הגדרות חדשות", againBtn:"🔄 שוב על אותה רשימה",
+    noWords:"אין מילים שמתאימות לסינון הזה — נסו סינון אחר",
+    empty:"(לא נכתב כלום)",
+    correctSpelling:"האיות הנכון",
+    practiceBtn:"🎮 תרגול על המילים האלה",
+    practiceHubTitle:"בחרו משחק תרגול",
+    practiceHubSubtitle:(n)=>`תרגול על ${n} המילים מההכתבה הזו`,
+    builderGameName:"בונה המילים", builderGameDesc:"שומעים את המילה ובונים אותה מאותיות מעורבבות",
+    chooseGameName:"איזו נכונה?", chooseGameDesc:"בוחרים את האיות הנכון מבין כמה אפשרויות",
+    raceGameName:"מירוץ נגד הזמן", raceGameDesc:"כותבים כמה שיותר מילים נכון לפני שהזמן נגמר",
+    soonLabel:"בקרוב",
+    backToResultsBtn:"↩️ חזרה לתוצאות",
+    builderProgress:(i,n)=>`מילה ${i} מתוך ${n}`,
+    builderStreak:(s)=>`🔥 רצף: ${s}`,
+    builderSpeakHint:"לחצו כדי לשמוע את המילה",
+    builderGood:"🎉 מעולה! נכון!",
+    builderBad:"כמעט... נסו שוב",
+    builderEmpty:"בחרו כמה אותיות קודם",
+    chooseProgress:(i,n)=>`מילה ${i} מתוך ${n}`,
+    chooseStreak:(s)=>`🔥 רצף: ${s}`,
+    chooseSpeakHint:"מקשיבים ובוחרים את האיות הנכון",
+    chooseGood:"🎉 נכון! כל הכבוד",
+    chooseBad:(word)=>`לא בדיוק... האיות הנכון: ${word}`,
+    raceIntroDesc:(n)=>`60 שניות, ${n} מילים במאגר — כותבים כמה שיותר מילים נכון לפני שהזמן נגמר. הרשימה חוזרת על עצמה אם מסיימים אותה.`,
+    raceHintReady:"המילה הבאה נשמעת... התחילו לכתוב!",
+    raceScoreLabel:(correct,total)=> total===0 ? `0 מתוך 0` : `${correct} מתוך ${total} נכונות`,
+    raceTimeUp:"⏰ הזמן נגמר!",
+    raceStartBtn:"▶️ התחילו מירוץ"
+  },
+  en: {
+    title: "✍️ Dictation Game",
+    subtitle: "Listen to the words and write them in sequence",
+    setupTitle: "Dictation settings",
+    labelTopic: "Topic", labelLen: "Word length", labelLetter: "First letter", labelMode: "Reading pace",
+    labelSource: "Word source",
+    srcGeneral:"General bank", srcExcel:"Excel file", srcImage:"Image", srcPdf:"PDF", srcTyping:"Typing", srcSaved:"Saved lists",
+    listNamePlaceholder:"List name (e.g. Weekly dictation - lesson 3)",
+    statusSavedAs:(name)=>`Saved as "${name}" and added to saved lists`,
+    savedListsEmptyText:"No saved lists yet. Create one in the Excel/Image/PDF/Typing tab and it will appear here.",
+    savedListMeta:(n)=>`${n} words`,
+    savedListDeleteConfirm:"Delete this list?",
+    noteMemoryOnly:"⚠️ Lists are kept only while this page stays open — reloading the page will clear them.",
+    filePromptExcel:"Choose an Excel file (xlsx/xls/csv)",
+    filePromptImage:"Choose an image with written words",
+    filePromptPdf:"Choose a PDF file",
+    extractBtnExcel:"📊 Extract words from file",
+    extractBtnImage:"🔍 Recognize words in image",
+    extractBtnPdf:"📄 Extract words from PDF",
+    labelCustomWords:"Word list (editable — one word per line, or comma-separated)",
+    useListBtn:"✅ Use this list",
+    typingPlaceholder:"Type words here — one per line, or comma-separated",
+    statusPickFile:"Choose a file first",
+    statusProcessing:"🔄 Processing the file...",
+    statusOcr:(p)=>`🔍 Recognizing text in image... ${p}%`,
+    statusDoneExcel:(n)=>`✅ Extracted ${n} items from the file. Review, edit if needed, then click "Use this list"`,
+    statusDoneImage:(n)=>`✅ Recognized ${n} words in the image. Review, fix any errors, then click "Use this list"`,
+    statusDonePdf:(n)=>`✅ Extracted ${n} words from the PDF. Review, edit if needed, then click "Use this list"`,
+    statusLoadError:"⚠️ Couldn't load the processing library. Check your internet connection and try again.",
+    statusExtractError:"⚠️ Couldn't extract text from this file. Try another one.",
+    statusCommitted:(n)=>`✅ Loaded ${n} words into the list`,
+    statusEmptyList:"⚠️ The list is empty — add words before using it",
+    labelCount: "Number of words in the list",
+    countAvailable:(n)=> n===1 ? `1 word available in this filter` : `${n} words available in this filter`,
+    countCapped:(n)=> `Only ${n} words match this filter — all of them will be included`,
+    topicAll: "All topics", lenAll: "All lengths", letterAll: "All letters",
+    lenLabel:(n)=>`${n} letters`, letterLabel:(l)=>`Starts with ${l}`,
+    modeManualName:"Word by tap", modeManualDesc:"The next word plays only when you tap the speaker button",
+    modeAutoName:"Auto sequence", modeAutoDesc:"After each word, the next one plays automatically — checked at the end",
+    startBtn:"▶️ Start dictation",
+    testVoice:"🔊 Test sound",
+    voiceOk:"✅ Sound works! You can start",
+    voiceNone:"⚠️ No voice found for this language. Try opening the file directly in a browser (Chrome/Safari) instead of a preview pane, or check that a voice for this language is installed on your device.",
+    voiceUnsupported:"⚠️ This browser doesn't support speech (Web Speech API).",
+    voiceTesting:"🔄 Testing...",
+    progress:(i,n)=>`Word ${i} of ${n}`,
+    speakHintManual:"Tap to hear the first word",
+    speakHintAuto:"The word will play — start writing",
+    placeholder:"Type here...",
+    submitBtn:"Next word ⏎", finishBtn:"✅ Finish & check",
+    enterHint:"You can also press Enter to move to the next word",
+    scoreLabel:"Correct words",
+    backBtn:"⚙️ New settings", againBtn:"🔄 Repeat this list",
+    noWords:"No words match this filter — try another one",
+    empty:"(nothing written)",
+    correctSpelling:"Correct spelling",
+    practiceBtn:"🎮 Practice these words",
+    practiceHubTitle:"Choose a practice game",
+    practiceHubSubtitle:(n)=>`Practice on the ${n} words from this dictation`,
+    builderGameName:"Word Builder", builderGameDesc:"Listen to the word and build it from scrambled letters",
+    chooseGameName:"Which one's correct?", chooseGameDesc:"Pick the correct spelling among a few options",
+    raceGameName:"Race against time", raceGameDesc:"Spell as many words correctly as you can before time runs out",
+    soonLabel:"Coming soon",
+    backToResultsBtn:"↩️ Back to results",
+    builderProgress:(i,n)=>`Word ${i} of ${n}`,
+    builderStreak:(s)=>`🔥 Streak: ${s}`,
+    builderSpeakHint:"Tap to hear the word",
+    builderGood:"🎉 Great job! Correct!",
+    builderBad:"Almost... try again",
+    builderEmpty:"Pick some letters first",
+    chooseProgress:(i,n)=>`Word ${i} of ${n}`,
+    chooseStreak:(s)=>`🔥 Streak: ${s}`,
+    chooseSpeakHint:"Listen, then pick the correct spelling",
+    chooseGood:"🎉 Correct! Well done",
+    chooseBad:(word)=>`Not quite... correct spelling: ${word}`,
+    raceIntroDesc:(n)=>`60 seconds, ${n} words in the pool — spell as many as you can before time runs out. The list repeats if you finish it.`,
+    raceHintReady:"Next word playing... start typing!",
+    raceScoreLabel:(correct,total)=> total===0 ? `0 of 0` : `${correct} of ${total} correct`,
+    raceTimeUp:"⏰ Time's up!",
+    raceStartBtn:"▶️ Start race"
+  }
+};
+
+/* ---------- State ---------- */
+let lang = 'he';
+let mode = 'manual'; // 'manual' | 'auto'
+let sessionWords = [];
+let currentIndex = 0;
+let checked = false;
+let voicesCache = [];
+let sourceTab = 'general'; // 'general' | 'excel' | 'image' | 'pdf' | 'typing' | 'saved'
+let customWords = []; // [{word, topic:'custom'}]
+let savedLists = []; // [{id, name, words:[{word,topic}], lang, sourceType}] — kept in memory only
+
+/* ---------- Voice loading ---------- */
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  voicesCache = window.speechSynthesis.getVoices();
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function pickVoice(targetLang){
+  // targetLang like 'he-IL' or 'en-US'
+  if(!voicesCache || voicesCache.length===0) loadVoices();
+  const prefix = targetLang.split('-')[0];
+  return voicesCache.find(v=>v.lang===targetLang)
+      || voicesCache.find(v=>v.lang && v.lang.toLowerCase().startsWith(prefix))
+      || null;
+}
+
+function speakText(text, targetLang, onend, onerror){
+  if(!('speechSynthesis' in window)){
+    if(onerror) onerror('unsupported');
+    return;
+  }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = targetLang;
+  utter.rate = 0.85;
+  utter.volume = 1;
+  const voice = pickVoice(targetLang);
+  if(voice) utter.voice = voice;
+  else if(onerror) {
+    // no matching voice installed for this language — likely to stay silent
+    onerror('no-voice');
+  }
+  utter.onend = onend || null;
+  utter.onerror = ()=>{ if(onerror) onerror('speech-error'); };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+
+function testVoice(){
+  const t = TXT[lang];
+  const status = document.getElementById('voiceStatus');
+  status.textContent = t.voiceTesting;
+  const targetLang = lang==='he' ? 'he-IL' : 'en-US';
+  const sample = lang==='he' ? 'שלום' : 'hello';
+
+  if(!('speechSynthesis' in window)){
+    status.textContent = t.voiceUnsupported;
+    return;
+  }
+  // give voices a moment to load if this is the first interaction
+  setTimeout(()=>{
+    const voice = pickVoice(targetLang);
+    if(!voice){
+      status.textContent = t.voiceNone;
+      return;
+    }
+    speakText(sample, targetLang,
+      ()=>{ status.textContent = t.voiceOk; },
+      ()=>{ status.textContent = t.voiceNone; }
+    );
+  }, 150);
+}
+
+/* ---------- Language / setup ---------- */
+function setLang(l){
+  lang = l;
+  document.getElementById('btnHe').classList.toggle('active', l==='he');
+  document.getElementById('btnEn').classList.toggle('active', l==='en');
+  document.getElementById('app').setAttribute('dir', l==='he' ? 'rtl' : 'ltr');
+  document.documentElement.lang = l;
+  customWords = [];
+  document.getElementById('customWordsArea').value = '';
+  setSource('general');
+  applyStaticText();
+  buildFilterOptions();
+  backToSetup();
+}
+
+function applyStaticText(){
+  const t = TXT[lang];
+  document.getElementById('titleText').textContent = t.title;
+  document.getElementById('subtitleText').textContent = t.subtitle;
+  document.getElementById('setupTitle').textContent = t.setupTitle;
+  document.getElementById('labelTopic').textContent = t.labelTopic;
+  document.getElementById('labelLen').textContent = t.labelLen;
+  document.getElementById('labelLetter').textContent = t.labelLetter;
+  document.getElementById('labelCount').textContent = t.labelCount;
+  document.getElementById('labelMode').textContent = t.labelMode;
+  document.getElementById('labelSource').textContent = t.labelSource;
+  document.getElementById('srcGeneralLabel').textContent = t.srcGeneral;
+  document.getElementById('srcExcelLabel').textContent = t.srcExcel;
+  document.getElementById('srcImageLabel').textContent = t.srcImage;
+  document.getElementById('srcPdfLabel').textContent = t.srcPdf;
+  document.getElementById('srcTypingLabel').textContent = t.srcTyping;
+  document.getElementById('srcSavedLabel').textContent = t.srcSaved;
+  document.getElementById('labelCustomWords').textContent = t.labelCustomWords;
+  document.getElementById('useListBtn').textContent = t.useListBtn;
+  document.getElementById('customWordsArea').placeholder = t.typingPlaceholder;
+  document.getElementById('listNameInput').placeholder = t.listNamePlaceholder;
+  document.getElementById('savedListsEmpty').textContent = t.savedListsEmptyText;
+  document.getElementById('noteMemoryOnly').textContent = t.noteMemoryOnly;
+  refreshSourcePanelCopy();
+  renderSavedLists();
+  document.getElementById('modeManualName').textContent = t.modeManualName;
+  document.getElementById('modeManualDesc').textContent = t.modeManualDesc;
+  document.getElementById('modeAutoName').textContent = t.modeAutoName;
+  document.getElementById('modeAutoDesc').textContent = t.modeAutoDesc;
+  document.getElementById('startBtn').textContent = t.startBtn;
+  document.getElementById('testVoiceBtn').textContent = t.testVoice;
+  document.getElementById('voiceStatus').textContent = '';
+  document.getElementById('enterHint').textContent = t.enterHint;
+  document.getElementById('scoreLabel').textContent = t.scoreLabel;
+  document.getElementById('backBtn').textContent = t.backBtn;
+  document.getElementById('againBtn').textContent = t.againBtn;
+  document.getElementById('finishBtn').textContent = t.finishBtn;
+
+  document.getElementById('practiceBtn').textContent = t.practiceBtn;
+  document.getElementById('practiceHubTitle').textContent = t.practiceHubTitle;
+  document.getElementById('builderGameName').textContent = t.builderGameName;
+  document.getElementById('builderGameDesc').textContent = t.builderGameDesc;
+  document.getElementById('chooseGameName').textContent = t.chooseGameName;
+  document.getElementById('chooseGameDesc').textContent = t.chooseGameDesc;
+  document.getElementById('raceGameName').textContent = t.raceGameName;
+  document.getElementById('raceGameDesc').textContent = t.raceGameDesc;
+  document.getElementById('practiceHubBackBtn').textContent = t.backToResultsBtn;
+  document.getElementById('practiceHubSetupBtn').textContent = t.backBtn;
+  document.getElementById('builderBackBtn').textContent = t.backToResultsBtn;
+  document.getElementById('builderSetupBtn').textContent = t.backBtn;
+  document.getElementById('chooseBackBtn').textContent = t.backToResultsBtn;
+  document.getElementById('chooseSetupBtn').textContent = t.backBtn;
+  document.getElementById('chooseSpeakHint').textContent = t.chooseSpeakHint;
+  document.getElementById('raceIntroTitle').textContent = t.raceGameName;
+  document.getElementById('raceBackBtn').textContent = t.backToResultsBtn;
+  document.getElementById('raceStartBtn').textContent = t.raceStartBtn;
+}
+
+function setMode(m){
+  mode = m;
+  document.getElementById('modeManualCard').classList.toggle('selected', m==='manual');
+  document.getElementById('modeAutoCard').classList.toggle('selected', m==='auto');
+}
+
+/* ---------- Word source (general bank vs custom lists) ---------- */
+function setSource(src){
+  sourceTab = src;
+  ['General','Excel','Image','Pdf','Typing','Saved'].forEach(name=>{
+    const id = 'tab' + name;
+    document.getElementById(id).classList.toggle('active', name.toLowerCase() === src);
+  });
+
+  const isGeneral = src === 'general';
+  const isSaved = src === 'saved';
+  document.getElementById('topicField').classList.toggle('hidden', !isGeneral);
+  document.getElementById('customSourcePanel').classList.toggle('hidden', isGeneral || isSaved);
+  document.getElementById('savedListsPanel').classList.toggle('hidden', !isSaved);
+
+  if(isSaved){
+    customWords = [];
+    renderSavedLists();
+    buildFilterOptions();
+    return;
+  }
+
+  const fileWrap = document.getElementById('fileInputWrap');
+  const fileInput = document.getElementById('fileInput');
+  const extractBtn = document.getElementById('extractBtn');
+  const status = document.getElementById('extractStatus');
+  status.textContent = '';
+
+  if(src === 'typing'){
+    fileWrap.classList.add('hidden');
+  } else if(!isGeneral){
+    fileWrap.classList.remove('hidden');
+    fileInput.value = '';
+    if(src === 'excel'){
+      fileInput.accept = '.xlsx,.xls,.csv';
+      extractBtn.textContent = TXT[lang].extractBtnExcel;
+    } else if(src === 'image'){
+      fileInput.accept = 'image/*';
+      extractBtn.textContent = TXT[lang].extractBtnImage;
+    } else if(src === 'pdf'){
+      fileInput.accept = '.pdf';
+      extractBtn.textContent = TXT[lang].extractBtnPdf;
+    }
+  }
+
+  buildFilterOptions();
+}
+
+function refreshSourcePanelCopy(){
+  const t = TXT[lang];
+  if(sourceTab === 'excel') document.getElementById('extractBtn').textContent = t.extractBtnExcel;
+  if(sourceTab === 'image') document.getElementById('extractBtn').textContent = t.extractBtnImage;
+  if(sourceTab === 'pdf') document.getElementById('extractBtn').textContent = t.extractBtnPdf;
+}
+
+function handleFileSelected(){
+  document.getElementById('extractStatus').textContent = '';
+}
+
+function parseWordsFromText(text){
+  if(!text) return [];
+  const raw = text.split(/[\n,;\t]+/).flatMap(chunk => chunk.split(/\s+/));
+  const cleaned = raw.map(w => w.trim()).filter(w => w.length > 0);
+  return [...new Set(cleaned)];
+}
+
+function commitCustomWordsFromTextarea(){
+  const text = document.getElementById('customWordsArea').value;
+  const words = parseWordsFromText(text);
+  const status = document.getElementById('extractStatus');
+  if(words.length === 0){
+    status.textContent = TXT[lang].statusEmptyList;
+    return;
+  }
+  customWords = words.map(w => ({ word: w, topic: 'custom' }));
+
+  const nameInput = document.getElementById('listNameInput');
+  const name = nameInput.value.trim() || `${TXT[lang].srcSaved} ${savedLists.length + 1}`;
+  savedLists.push({
+    id: Date.now(),
+    name,
+    words: customWords.slice(),
+    lang,
+    sourceType: sourceTab
+  });
+  nameInput.value = '';
+
+  status.textContent = `${TXT[lang].statusCommitted(words.length)} — ${TXT[lang].statusSavedAs(name)}`;
+  buildFilterOptions();
+}
+
+/* ---------- Saved lists (in-memory history) ---------- */
+function renderSavedLists(){
+  const container = document.getElementById('savedListsContainer');
+  const empty = document.getElementById('savedListsEmpty');
+  if(!container) return;
+
+  const relevant = savedLists.filter(l => l.lang === lang);
+  if(relevant.length === 0){
+    container.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  container.innerHTML = relevant.map(l => `
+    <div class="saved-list-item" data-id="${l.id}" onclick="selectSavedList(${l.id})">
+      <div class="saved-list-info">
+        <span class="saved-list-name">${escapeHtml(l.name)}</span>
+        <span class="saved-list-meta">${TXT[lang].savedListMeta(l.words.length)}</span>
+      </div>
+      <button class="saved-list-delete" onclick="deleteSavedList(event, ${l.id})" aria-label="delete">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function selectSavedList(id){
+  const list = savedLists.find(l => l.id === id);
+  if(!list) return;
+  customWords = list.words.slice();
+  document.querySelectorAll('.saved-list-item').forEach(el=>{
+    el.classList.toggle('selected', parseInt(el.dataset.id,10) === id);
+  });
+  buildFilterOptions();
+}
+
+function deleteSavedList(evt, id){
+  evt.stopPropagation();
+  if(!confirm(TXT[lang].savedListDeleteConfirm)) return;
+  savedLists = savedLists.filter(l => l.id !== id);
+  if(sourceTab === 'saved') customWords = [];
+  renderSavedLists();
+  buildFilterOptions();
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ---------- Lazy-loaded processing libraries ---------- */
+const LIBS = {
+  xlsx: 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+  pdf: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',
+  tesseract: 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'
+};
+
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    if(document.querySelector(`script[src="${src}"]`)){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('load-failed'));
+    document.head.appendChild(s);
+  });
+}
+
+function runExtraction(){
+  const file = document.getElementById('fileInput').files[0];
+  const status = document.getElementById('extractStatus');
+  if(!file){
+    status.textContent = TXT[lang].statusPickFile;
+    return;
+  }
+  status.textContent = TXT[lang].statusProcessing;
+  document.getElementById('extractBtn').disabled = true;
+
+  const done = () => { document.getElementById('extractBtn').disabled = false; };
+
+  if(sourceTab === 'excel') extractExcel(file).then(done).catch(()=>{ status.textContent = TXT[lang].statusLoadError; done(); });
+  else if(sourceTab === 'image') extractImage(file).then(done).catch(()=>{ status.textContent = TXT[lang].statusLoadError; done(); });
+  else if(sourceTab === 'pdf') extractPdf(file).then(done).catch(()=>{ status.textContent = TXT[lang].statusLoadError; done(); });
+}
+
+function extractExcel(file){
+  return loadScript(LIBS.xlsx).then(() => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try{
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+        const words = [];
+        rows.forEach(row => row.forEach(cell => {
+          if(cell !== null && cell !== undefined && String(cell).trim() !== ''){
+            words.push(String(cell).trim());
+          }
+        }));
+        document.getElementById('customWordsArea').value = words.join('\n');
+        document.getElementById('extractStatus').textContent = TXT[lang].statusDoneExcel(words.length);
+        resolve();
+      } catch(err){
+        document.getElementById('extractStatus').textContent = TXT[lang].statusExtractError;
+        reject(err);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  }));
+}
+
+function extractPdf(file){
+  return loadScript(LIBS.pdf).then(() => {
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = LIBS.pdfWorker;
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try{
+          const data = new Uint8Array(e.target.result);
+          const pdf = await window.pdfjsLib.getDocument({ data }).promise;
+          let fullText = '';
+          for(let i = 1; i <= pdf.numPages; i++){
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            fullText += content.items.map(it => it.str).join(' ') + '\n';
+          }
+          const words = parseWordsFromText(fullText);
+          document.getElementById('customWordsArea').value = words.join('\n');
+          document.getElementById('extractStatus').textContent = TXT[lang].statusDonePdf(words.length);
+          resolve();
+        } catch(err){
+          document.getElementById('extractStatus').textContent = TXT[lang].statusExtractError;
+          reject(err);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  });
+}
+
+function extractImage(file){
+  return loadScript(LIBS.tesseract).then(() => {
+    const ocrLang = lang === 'he' ? 'heb' : 'eng';
+    return window.Tesseract.recognize(file, ocrLang, {
+      logger: (m) => {
+        if(m.status === 'recognizing text'){
+          document.getElementById('extractStatus').textContent = TXT[lang].statusOcr(Math.round(m.progress * 100));
+        }
+      }
+    }).then(({ data: { text } }) => {
+      const words = parseWordsFromText(text);
+      document.getElementById('customWordsArea').value = words.join('\n');
+      document.getElementById('extractStatus').textContent = TXT[lang].statusDoneImage(words.length);
+    }).catch(err => {
+      document.getElementById('extractStatus').textContent = TXT[lang].statusExtractError;
+      throw err;
+    });
+  });
+}
+
+/* ---------- Word-count field (0-100 slider + number, synced) ---------- */
+function syncCountFromSlider(){
+  document.getElementById('countInput').value = document.getElementById('countSlider').value;
+}
+function syncCountFromInput(){
+  let v = parseInt(document.getElementById('countInput').value, 10);
+  if(isNaN(v)) v = 0;
+  v = Math.max(0, Math.min(100, v));
+  document.getElementById('countInput').value = v;
+  document.getElementById('countSlider').value = v;
+}
+function getRequestedCount(){
+  return parseInt(document.getElementById('countInput').value, 10) || 0;
+}
+function updateCountAvailable(){
+  const available = getFilteredWords().length;
+  const requested = getRequestedCount();
+  const note = document.getElementById('countAvailable');
+  if(requested > available){
+    note.textContent = TXT[lang].countCapped(available);
+  } else {
+    note.textContent = TXT[lang].countAvailable(available);
+  }
+}
+
+function getActivePool(){
+  return sourceTab === 'general' ? WORD_BANKS[lang] : customWords;
+}
+
+function buildFilterOptions(){
+  const bank = getActivePool();
+  const lens = [...new Set(bank.map(w=>w.word.length))].sort((a,b)=>a-b);
+  const letters = [...new Set(bank.map(w=>w.word[0]))].sort();
+  const t = TXT[lang];
+
+  if(sourceTab === 'general'){
+    const topics = [...new Set(bank.map(w=>w.topic))];
+    document.getElementById('topicFilter').innerHTML =
+      `<option value="all">${t.topicAll}</option>` + topics.map(x=>`<option value="${x}">${x}</option>`).join('');
+  }
+
+  document.getElementById('lenFilter').innerHTML =
+    `<option value="all">${t.lenAll}</option>` + lens.map(n=>`<option value="${n}">${t.lenLabel(n)}</option>`).join('');
+  document.getElementById('letterFilter').innerHTML =
+    `<option value="all">${t.letterAll}</option>` + letters.map(l=>`<option value="${l}">${t.letterLabel(l)}</option>`).join('');
+
+  updateCountAvailable();
+}
+
+function getFilteredWords(){
+  const bank = getActivePool();
+  const topic = sourceTab === 'general' ? document.getElementById('topicFilter').value : 'all';
+  const len = document.getElementById('lenFilter').value;
+  const letter = document.getElementById('letterFilter').value;
+  return bank.filter(w=>{
+    if(sourceTab === 'general' && topic!=='all' && w.topic!==topic) return false;
+    if(len!=='all' && String(w.word.length)!==len) return false;
+    if(letter!=='all' && w.word[0]!==letter) return false;
+    return true;
+  });
+}
+
+function backToSetup(){
+  document.getElementById('setupScreen').classList.remove('hidden');
+  document.getElementById('dictationScreen').classList.add('hidden');
+  document.getElementById('practiceHubScreen').classList.add('hidden');
+  document.getElementById('builderGameScreen').classList.add('hidden');
+  document.getElementById('chooseGameScreen').classList.add('hidden');
+  document.getElementById('raceGameScreen').classList.add('hidden');
+  stopRaceTimer();
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+function backToResults(){
+  document.getElementById('practiceHubScreen').classList.add('hidden');
+  document.getElementById('builderGameScreen').classList.add('hidden');
+  document.getElementById('chooseGameScreen').classList.add('hidden');
+  document.getElementById('raceGameScreen').classList.add('hidden');
+  document.getElementById('dictationScreen').classList.remove('hidden');
+  stopRaceTimer();
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+function openPracticeHub(){
+  document.getElementById('dictationScreen').classList.add('hidden');
+  document.getElementById('builderGameScreen').classList.add('hidden');
+  document.getElementById('chooseGameScreen').classList.add('hidden');
+  document.getElementById('raceGameScreen').classList.add('hidden');
+  document.getElementById('practiceHubScreen').classList.remove('hidden');
+  document.getElementById('practiceHubSubtitle').textContent = TXT[lang].practiceHubSubtitle(sessionWords.length);
+  stopRaceTimer();
+  window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+/* ---------- Dictation flow ---------- */
+function startDictation(){
+  const words = getFilteredWords();
+  if(words.length===0){
+    alert(TXT[lang].noWords);
+    return;
+  }
+  sessionWords = [...words];
+  shuffle(sessionWords);
+
+  const requested = getRequestedCount();
+  if(requested > 0 && requested < sessionWords.length){
+    sessionWords = sessionWords.slice(0, requested);
+  }
+
+  currentIndex = 0;
+  checked = false;
+
+  document.getElementById('setupScreen').classList.add('hidden');
+  document.getElementById('practiceHubScreen').classList.add('hidden');
+  document.getElementById('builderGameScreen').classList.add('hidden');
+  document.getElementById('chooseGameScreen').classList.add('hidden');
+  document.getElementById('raceGameScreen').classList.add('hidden');
+  document.getElementById('dictationScreen').classList.remove('hidden');
+
+  document.getElementById('wordList').innerHTML = '';
+  document.getElementById('finishBtn').classList.add('hidden');
+  document.getElementById('restartRow').classList.add('hidden');
+  document.getElementById('practiceBtn').classList.add('hidden');
+  document.getElementById('scoreSummary').classList.add('hidden');
+  document.getElementById('progressRow').classList.remove('hidden');
+  document.getElementById('progressBarTrack').classList.remove('hidden');
+  document.getElementById('speakRow').classList.remove('hidden');
+  document.getElementById('enterHint').classList.remove('hidden');
+
+  updateProgress();
+  addRow(0);
+
+  const speakBtn = document.getElementById('speakBtn');
+  const repeatBtn = document.getElementById('repeatBtn');
+  const hint = document.getElementById('speakHintText');
+
+  if(mode==='manual'){
+    speakBtn.disabled = false;
+    repeatBtn.classList.add('hidden');
+    hint.textContent = TXT[lang].speakHintManual;
+  } else {
+    speakBtn.disabled = true;
+    repeatBtn.classList.remove('hidden');
+    hint.textContent = TXT[lang].speakHintAuto;
+    speakCurrent(true);
+  }
+  focusRow(0);
+}
+
+function updateProgress(){
+  const t = TXT[lang];
+  const shown = Math.min(currentIndex+1, sessionWords.length);
+  document.getElementById('progressText').textContent = t.progress(shown, sessionWords.length);
+  document.getElementById('progressFill').style.width = `${(currentIndex/sessionWords.length)*100}%`;
+}
+
+function speakCurrent(pulse){
+  const entry = sessionWords[currentIndex];
+  if(!entry) return;
+  const targetLang = lang==='he' ? 'he-IL' : 'en-US';
+
+  speakText(entry.word, targetLang, null, (reason)=>{
+    if(reason==='no-voice' || reason==='unsupported'){
+      document.getElementById('speakHintText').textContent = TXT[lang].voiceNone;
+    }
+  });
+
+  if(pulse){
+    const btn = document.getElementById('speakBtn');
+    btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse');
+  }
+  if(mode==='manual'){
+    document.getElementById('speakBtn').disabled = true;
+  }
+}
+
+/* Builds one editable row per word. Rows stay editable (click into any of
+   them) until finishDictation() locks and grades them all at once. */
+function addRow(i){
+  const row = document.createElement('div');
+  row.className = 'word-row';
+  row.id = `row-${i}`;
+  row.innerHTML = `
+    <span class="row-num">${i+1}</span>
+    <input type="text" id="rowInput-${i}" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <span class="row-icon" id="rowIcon-${i}"></span>
+  `;
+  document.getElementById('wordList').appendChild(row);
+
+  const reveal = document.createElement('div');
+  reveal.className = 'correct-reveal';
+  reveal.id = `reveal-${i}`;
+  document.getElementById('wordList').appendChild(reveal);
+
+  const input = document.getElementById(`rowInput-${i}`);
+  input.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      if(!checked && i === currentIndex){
+        advance();
+      } else {
+        input.blur();
+      }
+    }
+  });
+}
+
+function focusRow(i){
+  const input = document.getElementById(`rowInput-${i}`);
+  if(input) input.focus();
+}
+
+function advance(){
+  currentIndex++;
+
+  if(currentIndex >= sessionWords.length){
+    revealFinish();
+    return;
+  }
+
+  addRow(currentIndex);
+  updateProgress();
+
+  if(mode==='manual'){
+    document.getElementById('speakBtn').disabled = false;
+    document.getElementById('speakHintText').textContent = TXT[lang].speakHintManual;
+  } else {
+    speakCurrent(true);
+  }
+  focusRow(currentIndex);
+}
+
+function revealFinish(){
+  document.getElementById('speakRow').classList.add('hidden');
+  document.getElementById('enterHint').classList.add('hidden');
+  document.getElementById('finishBtn').classList.remove('hidden');
+}
+
+/* ---------- Finish & check (all words graded together) ---------- */
+function finishDictation(){
+  checked = true;
+  let correctCount = 0;
+
+  sessionWords.forEach((entry, i)=>{
+    const input = document.getElementById(`rowInput-${i}`);
+    const typed = input.value.trim();
+    const isCorrect = typed === entry.word;
+    if(isCorrect) correctCount++;
+
+    const row = document.getElementById(`row-${i}`);
+    const icon = document.getElementById(`rowIcon-${i}`);
+    input.readOnly = true;
+    row.classList.add(isCorrect ? 'correct' : 'incorrect');
+    icon.textContent = isCorrect ? '✅' : '❌';
+
+    if(!isCorrect){
+      recordMistake(entry.word, typed);
+      document.getElementById(`reveal-${i}`).textContent = `${TXT[lang].correctSpelling}: ${entry.word}`;
+      row.addEventListener('click', ()=>{
+        row.classList.toggle('show-correct');
+      });
+    }
+  });
+
+  document.getElementById('finishBtn').classList.add('hidden');
+  document.getElementById('progressRow').classList.add('hidden');
+  document.getElementById('progressBarTrack').classList.add('hidden');
+
+  document.getElementById('scoreSummary').classList.remove('hidden');
+  document.getElementById('scoreNum').textContent = `${correctCount}/${sessionWords.length}`;
+
+  document.getElementById('restartRow').classList.remove('hidden');
+  document.getElementById('practiceBtn').classList.remove('hidden');
+}
+
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+}
+
+/* ---------- Practice: Word Builder (letter-scramble game) ---------- */
+/* Uses sessionWords — the exact words that were dictated in this specific
+   dictation session — not the full filtered pool. */
+let builderWords = [];
+let builderIndex = 0;
+let builderLetters = [];
+let builderTileOrder = [];
+let builderStreak = 0;
+
+function startBuilderGame(){
+  builderWords = [...sessionWords];
+  shuffle(builderWords);
+  builderIndex = 0;
+  builderStreak = 0;
+
+  document.getElementById('practiceHubScreen').classList.add('hidden');
+  document.getElementById('builderGameScreen').classList.remove('hidden');
+
+  loadBuilderWord();
+}
+
+function loadBuilderWord(){
+  const entry = builderWords[builderIndex];
+  builderLetters = new Array(entry.word.length).fill(null);
+  builderTileOrder = entry.word.split('');
+  shuffle(builderTileOrder);
+
+  document.getElementById('builderProgressText').textContent = TXT[lang].builderProgress(builderIndex+1, builderWords.length);
+  document.getElementById('builderStreakText').textContent = TXT[lang].builderStreak(builderStreak);
+  document.getElementById('builderSpeakHint').textContent = TXT[lang].builderSpeakHint;
+  document.getElementById('builderFeedback').textContent = '';
+  document.getElementById('builderFeedback').className = 'builder-feedback';
+
+  renderBuilderSlots();
+  renderBuilderTiles();
+}
+
+function renderBuilderSlots(){
+  document.getElementById('builderSlots').innerHTML = builderLetters.map((ch,i)=>
+    `<div class="builder-slot ${ch?'filled':''}" id="builderSlot-${i}">${ch||''}</div>`
+  ).join('');
+}
+
+function renderBuilderTiles(){
+  document.getElementById('builderTiles').innerHTML = builderTileOrder.map((ch,i)=>
+    `<button class="builder-tile" id="builderTile-${i}" onclick="placeBuilderLetter(${i})">${ch}</button>`
+  ).join('');
+}
+
+function placeBuilderLetter(tileIdx){
+  const emptySlot = builderLetters.findIndex(c=>c===null);
+  if(emptySlot === -1) return;
+  const tileBtn = document.getElementById('builderTile-'+tileIdx);
+  if(tileBtn.classList.contains('used')) return;
+
+  builderLetters[emptySlot] = builderTileOrder[tileIdx];
+  tileBtn.classList.add('used');
+  tileBtn.dataset.slot = emptySlot;
+  renderBuilderSlots();
+}
+
+function removeLastBuilderLetter(){
+  for(let i=builderLetters.length-1; i>=0; i--){
+    if(builderLetters[i] !== null){
+      builderLetters[i] = null;
+      const tiles = document.querySelectorAll('.builder-tile.used');
+      for(const t of tiles){
+        if(parseInt(t.dataset.slot) === i){ t.classList.remove('used'); break; }
+      }
+      renderBuilderSlots();
+      break;
+    }
+  }
+}
+
+function clearBuilderSlots(){
+  builderLetters = builderLetters.map(()=>null);
+  document.querySelectorAll('.builder-tile').forEach(t=>t.classList.remove('used'));
+  renderBuilderSlots();
+}
+
+function checkBuilderWord(){
+  if(builderLetters.includes(null)){
+    const feedback = document.getElementById('builderFeedback');
+    feedback.textContent = TXT[lang].builderEmpty;
+    feedback.className = 'builder-feedback bad';
+    return;
+  }
+  const attempt = builderLetters.join('');
+  const entry = builderWords[builderIndex];
+  const feedback = document.getElementById('builderFeedback');
+
+  if(attempt === entry.word){
+    feedback.textContent = TXT[lang].builderGood;
+    feedback.className = 'builder-feedback good';
+    builderStreak++;
+    document.getElementById('builderStreakText').textContent = TXT[lang].builderStreak(builderStreak);
+    setTimeout(nextBuilderWord, 900);
+  } else {
+    feedback.textContent = TXT[lang].builderBad;
+    feedback.className = 'builder-feedback bad';
+    builderStreak = 0;
+    document.getElementById('builderStreakText').textContent = TXT[lang].builderStreak(builderStreak);
+    recordMistake(entry.word, attempt);
+    document.querySelectorAll('.builder-slot').forEach(s=>s.classList.add('wrong'));
+    setTimeout(()=>document.querySelectorAll('.builder-slot').forEach(s=>s.classList.remove('wrong')), 350);
+  }
+}
+
+function nextBuilderWord(){
+  builderIndex = (builderIndex + 1) % builderWords.length;
+  loadBuilderWord();
+}
+
+function speakBuilderWord(pulse){
+  const entry = builderWords[builderIndex];
+  if(!entry) return;
+  const targetLang = lang==='he' ? 'he-IL' : 'en-US';
+  speakText(entry.word, targetLang, null, (reason)=>{
+    if(reason==='no-voice' || reason==='unsupported'){
+      document.getElementById('builderSpeakHint').textContent = TXT[lang].voiceNone;
+    }
+  });
+  if(pulse){
+    const btn = document.getElementById('builderSpeakBtn');
+    btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse');
+  }
+}
+
+/* ---------- Practice: "Which one's correct?" (multiple choice) ---------- */
+const HE_LETTERS = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+const EN_LETTERS = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+/* Letters that sound alike / are commonly confused by Hebrew learners
+   when spelling — used to make substitution-based distractors realistic
+   instead of purely random. */
+const HE_CONFUSABLES = {
+  'כ':['ח','ק'], 'ח':['כ'], 'ק':['כ'],
+  'ת':['ט'], 'ט':['ת'],
+  'ס':['ש'], 'ש':['ס'],
+  'א':['ע'], 'ע':['א'],
+  'ב':['ו'], 'ו':['ב']
+};
+/* Hebrew final-letter forms vs. their regular forms — swapping these at
+   the end of a word is one of the most common beginner mistakes. */
+const HE_FINALS = { 'ם':'מ', 'ן':'נ', 'ץ':'צ', 'ף':'פ', 'ך':'כ' };
+
+const EN_CONFUSABLES = {
+  'c':['k','s'], 'k':['c'], 's':['c','z'], 'z':['s'],
+  'i':['e'], 'e':['i'], 'a':['e'], 'o':['u'], 'u':['o'],
+  'f':['v'], 'v':['f']
+};
+
+let chooseWords = [];
+let chooseIndex = 0;
+let chooseStreak = 0;
+let chooseAnswered = false;
+
+function randomLetterPool(){
+  return lang === 'he' ? HE_LETTERS : EN_LETTERS;
+}
+function confusableMap(){
+  return lang === 'he' ? HE_CONFUSABLES : EN_CONFUSABLES;
+}
+
+/* ---------- In-memory "mistake bank": real errors this child has typed,
+   captured automatically from the dictation, builder, and race games.
+   Kept in memory only — resets if the page reloads. ---------- */
+let mistakeLog = {}; // `${lang}:${word}` -> Set of wrong attempts
+
+function recordMistake(word, attempt){
+  if(!attempt || attempt === word) return;
+  const key = `${lang}:${word}`;
+  if(!mistakeLog[key]) mistakeLog[key] = new Set();
+  if(mistakeLog[key].size < 6) mistakeLog[key].add(attempt);
+}
+
+function realMistakesFor(word){
+  const key = `${lang}:${word}`;
+  return mistakeLog[key] ? [...mistakeLog[key]] : [];
+}
+
+/* Builds distractors in priority order:
+   1. Real mistakes this child has actually typed for this word (best fit).
+   2. A Hebrew final-letter/regular-letter swap, if applicable.
+   3. A phonetically-confusable letter substitution.
+   4. Generic letter manipulations (swap/drop/double/random) as filler. */
+function generateMisspellings(word, count){
+  const variants = new Set();
+
+  realMistakesFor(word).forEach(m => { if(variants.size < count) variants.add(m); });
+
+  if(lang === 'he' && variants.size < count){
+    const last = word[word.length - 1];
+    if(HE_FINALS[last]){
+      const swapped = word.slice(0, -1) + HE_FINALS[last];
+      if(swapped !== word) variants.add(swapped);
+    }
+  }
+
+  const confusables = confusableMap();
+  let guard = 0;
+  while(variants.size < count && guard < word.length * 2){
+    guard++;
+    const i = guard % word.length;
+    const options = confusables[word[i]];
+    if(options && options.length){
+      const sub = options[Math.floor(Math.random() * options.length)];
+      const candidate = word.slice(0, i) + sub + word.slice(i + 1);
+      if(candidate !== word) variants.add(candidate);
+    }
+    if(variants.size >= count) break;
+  }
+
+  const pool = randomLetterPool();
+  const genericAttempts = [];
+  if(word.length >= 2){
+    genericAttempts.push(() => {
+      const i = Math.floor(Math.random() * (word.length - 1));
+      const chars = word.split('');
+      [chars[i], chars[i+1]] = [chars[i+1], chars[i]];
+      return chars.join('');
+    });
+  }
+  if(word.length >= 3){
+    genericAttempts.push(() => {
+      const i = Math.floor(Math.random() * word.length);
+      return word.slice(0, i) + word.slice(i + 1);
+    });
+  }
+  genericAttempts.push(() => {
+    const i = Math.floor(Math.random() * word.length);
+    return word.slice(0, i + 1) + word[i] + word.slice(i + 1);
+  });
+  genericAttempts.push(() => {
+    const i = Math.floor(Math.random() * word.length);
+    const randomLetter = pool[Math.floor(Math.random() * pool.length)];
+    return word.slice(0, i) + randomLetter + word.slice(i + 1);
+  });
+
+  guard = 0;
+  while(variants.size < count && guard < 30 && genericAttempts.length){
+    guard++;
+    const fn = genericAttempts[guard % genericAttempts.length];
+    const candidate = fn();
+    if(candidate && candidate !== word) variants.add(candidate);
+  }
+
+  return [...variants].slice(0, count);
+}
+
+function startChooseGame(){
+  chooseWords = [...sessionWords];
+  shuffle(chooseWords);
+  chooseIndex = 0;
+  chooseStreak = 0;
+
+  document.getElementById('practiceHubScreen').classList.add('hidden');
+  document.getElementById('chooseGameScreen').classList.remove('hidden');
+
+  loadChooseWord();
+}
+
+function loadChooseWord(){
+  const entry = chooseWords[chooseIndex];
+  chooseAnswered = false;
+
+  const distractors = generateMisspellings(entry.word, 3);
+  const options = shuffle([entry.word, ...distractors]);
+
+  document.getElementById('chooseProgressText').textContent = TXT[lang].chooseProgress(chooseIndex+1, chooseWords.length);
+  document.getElementById('chooseStreakText').textContent = TXT[lang].chooseStreak(chooseStreak);
+  document.getElementById('chooseFeedback').textContent = '';
+  document.getElementById('chooseFeedback').className = 'builder-feedback';
+
+  document.getElementById('chooseOptions').innerHTML = options.map(opt =>
+    `<button class="choose-option" data-answer="${escapeHtml(opt)}" onclick="selectChooseOption(this, '${escapeHtml(opt).replace(/'/g,"\\'")}')">${escapeHtml(opt)}</button>`
+  ).join('');
+
+  speakChooseWord(true);
+}
+
+function selectChooseOption(btnEl, chosen){
+  if(chooseAnswered) return;
+  chooseAnswered = true;
+
+  const entry = chooseWords[chooseIndex];
+  const isCorrect = chosen === entry.word;
+  const feedback = document.getElementById('chooseFeedback');
+
+  document.querySelectorAll('.choose-option').forEach(btn => {
+    btn.classList.add('disabled');
+    if(btn.dataset.answer === entry.word) btn.classList.add('correct');
+    else if(btn === btnEl) btn.classList.add('incorrect');
+  });
+
+  if(isCorrect){
+    feedback.textContent = TXT[lang].chooseGood;
+    feedback.className = 'builder-feedback good';
+    chooseStreak++;
+  } else {
+    feedback.textContent = TXT[lang].chooseBad(entry.word);
+    feedback.className = 'builder-feedback bad';
+    chooseStreak = 0;
+  }
+  document.getElementById('chooseStreakText').textContent = TXT[lang].chooseStreak(chooseStreak);
+
+  setTimeout(() => {
+    chooseIndex = (chooseIndex + 1) % chooseWords.length;
+    loadChooseWord();
+  }, 1400);
+}
+
+function speakChooseWord(pulse){
+  const entry = chooseWords[chooseIndex];
+  if(!entry) return;
+  const targetLang = lang==='he' ? 'he-IL' : 'en-US';
+  speakText(entry.word, targetLang, null, (reason)=>{
+    if(reason==='no-voice' || reason==='unsupported'){
+      document.getElementById('chooseSpeakHint').textContent = TXT[lang].voiceNone;
+    }
+  });
+  if(pulse){
+    const btn = document.getElementById('chooseSpeakBtn');
+    btn.classList.remove('pulse'); void btn.offsetWidth; btn.classList.add('pulse');
+  }
+}
+
+/* ---------- Practice: "Race against time" ---------- */
+const RACE_DURATION = 60; // seconds
+let raceWords = [];
+let raceIndex = 0;
+let raceCorrect = 0;
+let raceTotal = 0;
+let raceTimeLeft = RACE_DURATION;
+let raceTimerId = null;
+
+function startRaceGame(){
+  document.getElementById('practiceHubScreen').classList.add('hidden');
+  document.getElementById('raceGameScreen').classList.remove('hidden');
+
+  document.getElementById('raceIntroPanel').classList.remove('hidden');
+  document.getElementById('racePlayPanel').classList.add('hidden');
+  document.getElementById('raceResultsPanel').classList.add('hidden');
+  document.getElementById('raceIntroDesc').textContent = TXT[lang].raceIntroDesc(sessionWords.length);
+
+  stopRaceTimer();
+}
+
+function beginRaceGame(){
+  raceWords = [...sessionWords];
+  shuffle(raceWords);
+  raceIndex = 0;
+  raceCorrect = 0;
+  raceTotal = 0;
+  raceTimeLeft = RACE_DURATION;
+
+  document.getElementById('raceIntroPanel').classList.add('hidden');
+  document.getElementById('racePlayPanel').classList.remove('hidden');
+  document.getElementById('raceResultsPanel').classList.add('hidden');
+
+  updateRaceHud();
+  loadRaceWord();
+
+  const input = document.getElementById('raceInput');
+  input.value = '';
+  input.focus();
+
+  stopRaceTimer();
+  raceTimerId = setInterval(() => {
+    raceTimeLeft--;
+    updateRaceHud();
+    if(raceTimeLeft <= 0) endRaceGame();
+  }, 1000);
+}
+
+function stopRaceTimer(){
+  if(raceTimerId){
+    clearInterval(raceTimerId);
+    raceTimerId = null;
+  }
+}
+
+function updateRaceHud(){
+  document.getElementById('raceTimerText').textContent = `⏱️ ${Math.max(0, raceTimeLeft)}`;
+  document.getElementById('raceScoreText').textContent = `⭐ ${raceCorrect}`;
+  document.getElementById('raceTimerFill').style.width = `${(Math.max(0, raceTimeLeft) / RACE_DURATION) * 100}%`;
+}
+
+function loadRaceWord(){
+  if(raceIndex >= raceWords.length){
+    raceWords = shuffle([...sessionWords]);
+    raceIndex = 0;
+  }
+  document.getElementById('raceHintText').textContent = TXT[lang].raceHintReady;
+  const entry = raceWords[raceIndex];
+  const targetLang = lang==='he' ? 'he-IL' : 'en-US';
+  speakText(entry.word, targetLang, null, null);
+}
+
+function submitRaceAnswer(){
+  if(!raceTimerId) return;
+  const input = document.getElementById('raceInput');
+  const entry = raceWords[raceIndex];
+  const typed = input.value.trim();
+  const isCorrect = typed === entry.word;
+
+  raceTotal++;
+  if(isCorrect) raceCorrect++;
+  else recordMistake(entry.word, typed);
+
+  input.classList.remove('flash-good', 'flash-bad');
+  void input.offsetWidth;
+  input.classList.add(isCorrect ? 'flash-good' : 'flash-bad');
+
+  updateRaceHud();
+
+  raceIndex++;
+  input.value = '';
+  loadRaceWord();
+}
+
+document.getElementById('raceInput').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    submitRaceAnswer();
+  }
+});
+
+function endRaceGame(){
+  stopRaceTimer();
+  document.getElementById('racePlayPanel').classList.add('hidden');
+  document.getElementById('raceResultsPanel').classList.remove('hidden');
+  document.getElementById('raceResultScore').textContent = raceCorrect;
+  document.getElementById('raceResultLabel').textContent = TXT[lang].raceScoreLabel(raceCorrect, raceTotal);
+}
+
+/* ---------- Init ---------- */
+applyStaticText();
+buildFilterOptions();
+</script>
+</body>
+</html>
