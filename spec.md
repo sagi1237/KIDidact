@@ -131,7 +131,7 @@
 
 ## 11. GitHub ופריסה
 
-- מאגר `sagi1237/KIDidact`, פרטי, ענף ראשי `main`.
+- מאגר `sagi1237/KIDidact`, ציבורי, ענף ראשי `main`.
+- האתר: https://sagi1237.github.io/KIDidact/
 - עותק העבודה: `C:Usersm365devKIDidact`.
-- פריסה ל-GitHub Pages דרך GitHub Actions, עם `base: '/KIDidact/'` ב-Vite.
-- **[פתוח]** בתוכנית GitHub Free, ‏Pages זמין רק למאגר ציבורי. האתר המפורסם נגיש לכולם.
+- כל push ל-`main` פורס ל-GitHub Pages דרך `.github/workflows/deploy.yml`, עם `base: '/KIDidact/'` ב-Vite.

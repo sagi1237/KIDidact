@@ -6,6 +6,8 @@ Two activities today (both in the prototype): a **dictation game** (listen to a
 word, type it) and a **practice hub** with three mini-games (Word Builder,
 "Which one's correct?", Race against time).
 
+**Live:** https://sagi1237.github.io/KIDidact/ — every push to `main` deploys.
+
 ## Status
 
 **Phase 0 — repo scaffold.** The whole app is still the original single-file
